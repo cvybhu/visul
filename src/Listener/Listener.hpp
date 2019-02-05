@@ -34,7 +34,7 @@ private:
 //Sound info
     std::atomic<bool> somethingPlays;
     std::atomic<float> averageVolume;
-    std::atomic<float> averageAverage;
+    std::atomic<bool> spikeHappened;
 
 
     static const int minFrequecy = 20; 
@@ -42,4 +42,7 @@ private:
     std::vector<float> frequencies; //frequency intensities
     std::vector<float> frequenciesPrefixSum;
     mutable std::shared_mutex frequenciesLock;
+
+    std::vector<std::pair<int,int> > frequencyGroups;
+    std::vector<float> frequencyGroupsAvgerageAverage;
 };

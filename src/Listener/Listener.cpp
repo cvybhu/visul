@@ -13,7 +13,6 @@ Listener::Listener()
 //Initialize pulseaudio API
     int endianCheck = 1;
     bool isBigEndian = ((*((char*)&endianCheck)) == 0);
-    //std::cout << "isBigEndian: " << isBigEndian << '\n';
 
     static const pa_sample_spec sampleSpecs = {
         .format = (isBigEndian ? PA_SAMPLE_FLOAT32BE : PA_SAMPLE_FLOAT32LE),
@@ -38,9 +37,11 @@ Listener::Listener()
     }
 
 //Setup stuff
-    maxBuffSize = 1024; // To hold 0.5s of audio
+    maxBuffSize = 1300; // To hold 0.5s of audio
 
     frequencies.resize(maxFrequency+1);
+    frequencyGroups = {{20, 300}, {300, 500}, {500, 800}, {800, 1200}, {1200, 5000}, {1500, 20*1000}};
+    frequencyGroupsAvgerageAverage.resize(frequencyGroups.size(), 0.f);
 
 
 //Start listening thread
@@ -59,7 +60,7 @@ void Listener::mainThreadFunc()
     fftw_plan dftPlan = fftw_plan_dft_r2c_1d(maxBuffSize, dftIn.data(), dftOut, 0);
 
 
-    std::vector<float> readBuff(1024); //Reads size() samples of audio -> processes
+    std::vector<float> readBuff(maxBuffSize); //Reads size() samples of audio -> processes
 
     while(!isTimeToStop)
     {
@@ -102,15 +103,8 @@ void Listener::mainThreadFunc()
             averageVolume = 20 * log(1.f+avgVolume); //to dB
         }
 
-        //averageAverage for spike detecting
-        {
-            float updateRatio = 0.2;
-            averageAverage = averageVolume * updateRatio + averageAverage * (1.f - updateRatio);
-        }
 
-        
         //Get frequencies with Discrete Fourier Transform
-        if(1)
         {
             for(int i = 0; i < maxBuffSize; i++)
                 dftIn[i] = buff[i%buff.size()];
@@ -128,12 +122,13 @@ void Listener::mainThreadFunc()
                 float curFrequency = (float)i * ((float)sampleRate / (float)buff.size());
                 float intensity = sqrt(dftOut[i][0]*dftOut[i][0] + dftOut[i][1]*dftOut[i][1]);
                 intensity /= (float)maxBuffSize;
-                intensity = log(1.f+intensity) * sqrt(curFrequency) / avgVolume / 10.f;
+
+                if(avgVolume != 0)
+                    intensity = log(1.f+intensity) * sqrt(curFrequency) / avgVolume / 10.f;
 
                 if(minFrequecy <= (int)curFrequency && (int)curFrequency <= maxFrequency)
                 {
                     frequencies[(int)curFrequency] = intensity;
-                    
                     //Lineary interpolate these in between
                     for(int f = lastFrequency+1; f < (int)curFrequency; f++)
                     {
@@ -148,6 +143,31 @@ void Listener::mainThreadFunc()
             }
 
             frequenciesLock.unlock();
+        }
+
+
+        //averageAverage for spike detecting
+        {
+            spikeHappened = false;
+
+            auto newAverageAverage = [](float avgAverage, float newAvg) -> float
+            {
+                float updateRatio = 0.3;
+                return newAvg * updateRatio + avgAverage * (1.f - updateRatio);
+            };
+
+            for(int i = 0; i < (int)frequencyGroups.size(); i++)
+            {
+                auto& curGroup = frequencyGroups[i];
+                float& curAverageAverage = frequencyGroupsAvgerageAverage[i];
+                float curAverage = getAvgFrequency(curGroup.first, curGroup.second);
+
+                curAverageAverage = newAverageAverage(curAverageAverage, curAverage);
+
+
+                if(curAverage > 1.2 * curAverageAverage)
+                    spikeHappened = true;
+            }
         }
 
     }
@@ -189,14 +209,12 @@ float Listener::getAvgFrequency(int fromHz, int toHz) const
     assert(minFrequecy <= fromHz && toHz <= maxFrequency);
 
     frequenciesLock.lock_shared();
-    //std::cout << "Locked shared!!\n";
 
     float sum = 0.f;
     for(int f = fromHz; f <= toHz; f++)
         sum += frequencies[f];
 
     frequenciesLock.unlock_shared();
-    //std::cout << "Unlocked shared!!\n";
 
     return sum / (float)(toHz - fromHz + 1);
 }
@@ -206,19 +224,17 @@ float Listener::getMaxFrequency(int fromHz, int toHz) const
     assert(minFrequecy <= fromHz && toHz <= maxFrequency);
 
     frequenciesLock.lock_shared();
-    //std::cout << "Locked shared!!\n";
 
     float res = 0.f;
     for(int f = fromHz; f <= toHz; f++)
         res = std::max(res, frequencies[f]);
 
     frequenciesLock.unlock_shared();
-    //std::cout << "Unlocked shared!!\n";
 
     return res;
 }
 
 bool Listener::wasSpike() const
 {
-    return (averageVolume >  (1.1 * averageAverage));
+    return spikeHappened;
 }

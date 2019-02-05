@@ -2,7 +2,9 @@
 
 Strobe::Strobe(const Listener& lis, sf::RenderWindow& win)
     : Visualizator(lis, win)
-{}
+{
+    lastWasWhite = false;
+}
 
 void Strobe::update()
 {

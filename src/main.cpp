@@ -17,7 +17,7 @@ int main()
     Listener lis;
     
 //Setup main visul window
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "VISUL");
+    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "VISUL", sf::Style::Fullscreen);
     int refreshRate = 30;
     window.setFramerateLimit(refreshRate);
 
@@ -40,6 +40,13 @@ int main()
         auto frameStartTime = frameClock.now();
 
         //Events
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            window.close();
+            break;
+        }
+
+
         sf::Event event;
         while (window.pollEvent(event))
         {

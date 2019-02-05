@@ -1,4 +1,4 @@
-CXX = g++-8
+CXX = g++
 SRCS_DIR = src
 
 DEFINES = 
@@ -9,7 +9,7 @@ RELEASE_FLAGS = -O3 -flto
 INCLUDE_DIRS = -I./src -Ilibs
 LD_DIRS = -Llibs
 
-LD_FLAGS = $(LD_DIRS) -lstdc++fs -lpthread -lpulse -lpulse-simple -lsfml-graphics -lsfml-window -lsfml-system -lfftw3 -lm
+LD_FLAGS = $(LD_DIRS) -lpthread -lpulse -lpulse-simple -lsfml-graphics -lsfml-window -lsfml-system -lfftw3 -lm
 
 BUILD_DIR = build
 DEBUG_BUILD_DIR = $(BUILD_DIR)/debug

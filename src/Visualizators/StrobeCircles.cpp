@@ -11,7 +11,7 @@ StrobeCircles::StrobeCircles(const Listener& lis, sf::RenderWindow& win)
 
 void StrobeCircles::update()
 {
-    bool white = listener.wasSpike() && !lastWasWhite; 
+    bool white = listener.wasSpike() &&  !lastWasWhite; 
     lastWasWhite = white;
 
     auto windowSize = window.getSize();
@@ -21,13 +21,18 @@ void StrobeCircles::update()
         int circleDiff = 100; //Could be smaller if sfml didnt suck so much
         float moveSpeed = 3;
 
+        
+
         float timeInS = std::chrono::duration<float>(clock.now() - startTime).count();
         for(int i = sqrt(windowSize.x * windowSize.y) / circleDiff + 10; i >= 1; i--)
         {
             float circleSize = i * circleDiff;
             sf::CircleShape circle(circleSize);
 
-            circle.setFillColor(i%2 ? sf::Color::Black : sf::Color::White);
+            //sf::Color curColor = sf::Color::White;
+            sf::Color curColor = sf::Color(255.0 * 0.5f * (1.f+sin(5*timeInS)), 255.f*0.5f * (1.f+sin(6*timeInS)), 255.f);
+
+            circle.setFillColor(i%2 ? sf::Color::Black : curColor);
             circle.setOrigin(circleSize, circleSize);
             circle.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2));
 
