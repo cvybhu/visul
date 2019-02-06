@@ -37,7 +37,7 @@ Listener::Listener()
     }
 
 //Setup stuff
-    maxBuffSize = 1300; // To hold 0.5s of audio
+    maxBuffSize = 500; // To hold 0.5s of audio
 
     frequencies.resize(maxFrequency+1);
     frequencyGroups = {{20, 300}, {300, 500}, {500, 800}, {800, 1200}, {1200, 5000}, {1500, 20*1000}};

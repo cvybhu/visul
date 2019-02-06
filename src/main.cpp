@@ -17,7 +17,7 @@ int main()
     Listener lis;
     
 //Setup main visul window
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "VISUL", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "VISUL", sf::Style::None);
     int refreshRate = 30;
     window.setFramerateLimit(refreshRate);
 
