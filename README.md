@@ -1,24 +1,26 @@
-# visul
-Music Visualizator / projector lights system
+# Visul
+Music visualizator  
+Records sound via pulseaudio API and creates visualization  
+to show on projector & smoke setup. For now it has few visualizations  
+but more features are to come once I learn neural networks  
 
-Records sound via pulseaudio API and creates visualization
-
-make debug/release
-to build
+![](readme/screenshot.png)
 
 
-[USED LIBRARIES]:
 
-PULSEAUDIO:
+## Building
+**[WARNING - do not run if you have epilepsy]**  
+To build run `make release` or `make debug`  
+To run do `./main`  
+
+#### USED LIBRARIES:
+
+Pulseaudio:  
 sudo apt install libpulse-dev
 
-SFML:
+SFML:  
 sudo apt install libsfml-dev
 
-FFTW 3.3.8:
-http://www.fftw.org/download.html
-./configure
-make
-sudo make install
-
-
+FFTW 3.3.8:  
+http://www.fftw.org/download.html  
+./configure && make && sudo make install  

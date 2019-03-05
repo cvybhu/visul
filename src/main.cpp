@@ -7,6 +7,7 @@
 #include "Visualizators/FrequencyRects.hpp"
 #include "Visualizators/Strobe.hpp"
 #include "Visualizators/StrobeCircles.hpp"
+#include "Visualizators/SmallCirclesVis.hpp"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ int main()
     FrequencyRects frequencyRectsVis(lis, window);
     Strobe strobeVis(lis, window);
     StrobeCircles strobeCirclesVis(lis, window);
+    SmallCirclesVis smallCirclesVis(lis, window);
 
 
     Visualizator* curVisualizator = &strobeCirclesVis;

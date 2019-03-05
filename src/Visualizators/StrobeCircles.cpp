@@ -11,7 +11,7 @@ StrobeCircles::StrobeCircles(const Listener& lis, sf::RenderWindow& win)
 
 void StrobeCircles::update()
 {
-    bool white = listener.wasSpike();//&&  !lastWasWhite; 
+    bool white = listener.wasSpike() && !lastWasWhite; 
     lastWasWhite = white;
 
     auto windowSize = window.getSize();
