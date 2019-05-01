@@ -1,8 +1,8 @@
 # Visul
 Music visualizator  
 Records sound via pulseaudio API and creates visualization  
-to show on projector & smoke setup. For now it has few visualizations  
-but more features are to come once I learn neural networks  
+For now it can only show frequency bars or semi-rhythimc strobe cicles  
+Probably will be upgraded in the future with feature detection using neural networks or something  
 
 ![](readme/screenshot.png)
 
